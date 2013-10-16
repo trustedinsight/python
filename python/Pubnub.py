@@ -635,6 +635,7 @@ class Pubnub(PubnubCore):
             try: usock = urllib2.urlopen( url, None, 310 )
             except TypeError: usock = urllib2.urlopen( url, None )
             response = usock.read()
+            usock.fp._sock.recv = None
             usock.close()
             resp_json = json.loads(response)
         except:
