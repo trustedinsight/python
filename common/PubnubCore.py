@@ -97,7 +97,7 @@ class PubnubCore(PubnubBase):
                     channel,
                     '0',
                     str(timetoken)
-                ],"urlparams" : {"uuid" : self.uuid }})
+                ],"urlparams" : {"uuid" : self.uuid, "auth" : self.auth_key}})
 
                 messages          = response[0]
                 args['timetoken'] = response[1]
