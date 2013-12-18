@@ -110,7 +110,8 @@ class PubnubBase(object):
         cipher_key = False,
         ssl_on = False,
         origin = 'pubsub.pubnub.com',
-        UUID = None
+        UUID = None,
+        auth_key = None
     ) :
         """
         #**
@@ -138,6 +139,7 @@ class PubnubBase(object):
         self.cipher_key    = cipher_key
         self.ssl           = ssl_on
         self.pc            = PubnubCrypto()
+        self.auth_key      = auth_key
 
         if self.ssl :
             self.origin = 'https://' + self.origin
@@ -177,6 +179,13 @@ class PubnubBase(object):
 
         return message
 
+    def _return_wrapped_callback(self, callback=None):
+        def _new_format_callback(response):
+            if 'payload' in response:
+                if (callback != None): callback({'message' : response['message'], 'payload' : response['payload']})
+            else:
+                if (callback != None):callback(response)
+        if (callback != None): return _new_format_callback
 
     def publish( self, args ) :
         """
@@ -226,7 +235,7 @@ class PubnubBase(object):
             channel,
             '0',
             message
-        ]}, callback)
+        ], 'urlparams' : {'auth' : self.auth_key}}, self._return_wrapped_callback(callback))
     
     def presence( self, args ) :
         """
@@ -266,7 +275,7 @@ class PubnubBase(object):
         callback  = args['callback']
         subscribe_key = args.get('subscribe_key') or self.subscribe_key
         
-        return self.subscribe({'channel': channel+'-pnpres', 'subscribe_key':subscribe_key, 'callback': callback})
+        return self.subscribe({'channel': channel+'-pnpres', 'subscribe_key':subscribe_key, 'callback': self._return_wrapped_callback(callback)})
     
     
     def here_now( self, args ) :
@@ -306,7 +315,7 @@ class PubnubBase(object):
             'v2','presence',
             'sub_key', self.subscribe_key,
             'channel', channel
-        ]}, callback);
+        ], 'urlparams' : {'auth' : self.auth_key}}, self._return_wrapped_callback(callback));
         
         
     def history( self, args ) :
@@ -350,7 +359,7 @@ class PubnubBase(object):
             channel,
             '0',
             str(limit)
-        ] }, callback);
+        ], 'urlparams' : {'auth' : self.auth_key} }, self._return_wrapped_callback(callback));
 
     def detailedHistory(self, args) :
         """
@@ -381,6 +390,7 @@ class PubnubBase(object):
             count = int(args['count'])
 
         params['count'] = str(count)    
+        params['auth']  = self.auth_key
         
         if args.has_key('reverse'):
             params['reverse'] = str(args['reverse']).lower()
@@ -410,7 +420,7 @@ class PubnubBase(object):
             self.subscribe_key,
             'channel',
             channel,
-        ],'urlparams' : params }, callback=callback);
+        ],'urlparams' : params }, callback=self._return_wrapped_callback(callback));
 
     def time(self, args = None) :
         """
@@ -440,22 +450,32 @@ class PubnubBase(object):
             return time[0]
 
 
+
     def _encode( self, request ) :
-        return [
+        return "".join([
             "".join([ ' ~`!@#$%^&*()+=[]\\{}|;\':",./<>?'.find(ch) > -1 and
                 hex(ord(ch)).replace( '0x', '%' ).upper() or
                 ch for ch in list(bit)
-            ]) for bit in request]
+            ]) for bit in request])
     
+    def _add_param(self, key, value):
+        if value:
+            return key + "=" + self._encode(value)
+        else:
+            return ""
+
     def getUrl(self,request):
         ## Build URL
+        args_string = None
         url = self.origin + '/' + "/".join([
             "".join([ ' ~`!@#$%^&*()+=[]\\{}|;\':",./<>?'.find(ch) > -1 and
                 hex(ord(ch)).replace( '0x', '%' ).upper() or
                 ch for ch in list(bit)
             ]) for bit in request["urlcomponents"]])
         if (request.has_key("urlparams")):
-            url = url + '?' + "&".join([ x + "=" + y  for x,y in request["urlparams"].iteritems()])
+            args_string = "&".join([ self._add_param(x,y)  for x,y in request["urlparams"].iteritems()])
+        if (args_string != None and len(args_string) > 0):
+            url = url + '?' + args_string
         return url
 
 
@@ -468,7 +488,8 @@ class PubnubCore(PubnubBase):
         cipher_key = False,
         ssl_on = False,
         origin = 'pubsub.pubnub.com',
-        uuid = None
+        uuid = None,
+        auth_key = None
     ) :
         """
         #**
@@ -495,7 +516,8 @@ class PubnubCore(PubnubBase):
             cipher_key=cipher_key,
             ssl_on=ssl_on,
             origin=origin,
-            UUID=uuid
+            UUID=uuid,
+            auth_key=auth_key
         )        
 
         self.subscriptions = {}
@@ -586,7 +608,8 @@ class Pubnub(PubnubCore):
         cipher_key = False,
         ssl_on = False,
         origin = 'pubsub.pubnub.com',
-        pres_uuid = None
+        pres_uuid = None,
+        auth_key = None
     ) :
         super(Pubnub, self).__init__(
             publish_key = publish_key,
@@ -595,21 +618,25 @@ class Pubnub(PubnubCore):
             cipher_key = cipher_key,
             ssl_on = ssl_on,
             origin = origin,
-            uuid = pres_uuid
+            uuid = pres_uuid,
+            auth_key = auth_key
         )        
 
     def _request( self, request, callback = None ) :
         ## Build URL
         url = self.getUrl(request)
+        usock = None
+        response = None
 
         ## Send Request Expecting JSONP Response
         try:
             try: usock = urllib2.urlopen( url, None, 310 )
+            except urllib2.HTTPError, e: response = e.fp.read()
             except TypeError: usock = urllib2.urlopen( url, None )
-            response = usock.read()
-            usock.close()
+            if (response == None): response = usock.read()
+            if (usock != None): usock.close()
             resp_json = json.loads(response)
-        except:
+        except Exception as e:
             return None
             
         if (callback):

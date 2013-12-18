@@ -26,7 +26,9 @@ class Pubnub(PubnubCoreAsync):
         secret_key = False,
         cipher_key = False,
         ssl_on = False,
-        origin = 'pubsub.pubnub.com'
+        origin = 'pubsub.pubnub.com',
+        pres_uuid = None,
+        auth_key = None
     ) :
         super(Pubnub, self).__init__(
             publish_key=publish_key,
@@ -35,6 +37,8 @@ class Pubnub(PubnubCoreAsync):
             cipher_key=cipher_key,
             ssl_on=ssl_on,
             origin=origin,
+            uuid = pres_uuid,
+            auth_key = auth_key
         )        
         self.headers = {}
         self.headers['User-Agent'] = ['Python-Twisted']

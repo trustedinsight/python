@@ -23,8 +23,10 @@ ssl_on        = len(sys.argv) > 5 and bool(sys.argv[5]) or False
 ## -----------------------------------------------------------------------
 ## Initiate Pubnub State
 ## -----------------------------------------------------------------------
+#pubnub = Pubnub( publish_key=publish_key, subscribe_key=subscribe_key,
+#    secret_key=secret_key, cipher_key=cipher_key, ssl_on=ssl_on)
 pubnub = Pubnub( publish_key=publish_key, subscribe_key=subscribe_key,
-    secret_key=secret_key, cipher_key=cipher_key, ssl_on=ssl_on)
+    secret_key=secret_key, cipher_key=cipher_key, ssl_on=ssl_on, auth_key="temp1")
 crazy  = 'hello_world'
 
 def print_cb(message):
