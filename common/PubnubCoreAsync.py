@@ -21,7 +21,8 @@ class PubnubCoreAsync(PubnubBase):
         cipher_key = False,
         ssl_on = False,
         origin = 'pubsub.pubnub.com',
-        uuid = None
+        uuid = None,
+        auth_key = None
     ) :
         """
         #**
@@ -47,7 +48,8 @@ class PubnubCoreAsync(PubnubBase):
             cipher_key=cipher_key,
             ssl_on=ssl_on,
             origin=origin,
-            UUID=uuid
+            UUID=uuid,
+            auth_key = auth_key
         )        
 
         self.subscriptions = {}
