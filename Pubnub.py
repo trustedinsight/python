@@ -714,11 +714,14 @@ class PubnubBase(object):
         self.error_callback = _error
 
         def _connect(message):
-            timestamp = self.timetoken
-            _read(object_id, timestamp, path=path_slashes)
+            if message == self.ds_location:
+                timestamp = self.timetoken
+                _read(object_id, timestamp, path=path_slashes)
 
         def _callback(message, channel):
-            self.ds_action_list.append(message)
+            if message:
+                self.ds_action_list.append(message)
+
             if self.timetoken > self.ds_timetoken:
                 self.ds_timetoken = self.timetoken
                 if channel.startswith('pn_ds_'):
@@ -749,10 +752,9 @@ class PubnubBase(object):
 
             def _read_callback(message):
                 self.ds_action_list.append(message)
-                if 'messaage' in message and message['message'] != 'OK':
+                if 'message' not in message or message['message'] != 'OK':
                     _error(message['message'])
-
-                if 'next_page' in message and message['next_page'] is not None:
+                elif 'next_page' in message and message['next_page'] is not None:
                     self.ds_temp.append(message['payload'])
                     _read(object_id, obj_at, path=message['start_at'])
                 else:
@@ -770,12 +772,8 @@ class PubnubBase(object):
             self._request({'urlcomponents': url_components, 'urlparams': url_params}, callback=_read_callback)
 
         self.ds_location = 'pn_ds_' + object_id + path
-        self.subscribe(channels=['pn_ds_' + object_id + path, 'pn_ds_' + object_id + path + '.*'],
+        self.subscribe(channels=['pn_ds_' + object_id + path, 'pn_ds_' + object_id + path + '.*', 'pn_dstr_' + object_id],
             connect=_connect,
-            callback=_callback,
-            error=_error)
-
-        self.subscribe(channels='pn_dstr_' + object_id,
             callback=_callback,
             error=_error)
 
