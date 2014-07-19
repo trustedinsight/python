@@ -44,8 +44,7 @@ class TestSimpleDataSync():
             async.set()
 
         p.get_synced_object(object_id, callback)
-        async.wait()
-        async.clear()
+        self.wait(async)
 
     def tearDown(self, async):
         """
@@ -62,14 +61,19 @@ class TestSimpleDataSync():
         p.publish(channel="pn_dstr_" + object_id, message={ 'trans_id' : -1 })
 
     def wait(self, async):
+        """
+        Wait for the threading.Event object to be set, then clear it for any
+        following async operations.
+        """
+
         async.wait()
         async.clear()
 
-
     @asyncTest
     def test_set(self, async):
-        now = time.time()
+        """Set object data with PUT."""
 
+        now = time.time()
         p.set(object_id, {
             "time" : now
         })
@@ -80,8 +84,9 @@ class TestSimpleDataSync():
 
     @asyncTest
     def test_merge(self, async):
-        now = time.time()
+        """Update object data with PATCH."""
 
+        now = time.time()
         p.merge(object_id, {
             "time" : now
         })
@@ -92,6 +97,8 @@ class TestSimpleDataSync():
 
     @asyncTest
     def test_delete(self, async):
+        """Delete object data with DELETE."""
+
         p.delete(object_id)
         self.wait(async)
 
