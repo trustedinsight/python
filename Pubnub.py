@@ -689,7 +689,7 @@ class PubnubBase(object):
 
         def _put_callback(message):
             self.ds_action_list.append(message)
-            if 'message' in message and message['message'] != 'Path Set':
+            if 'message' in message and message['message'] != 'Path set':
                 self.error_callback(message['message'])
 
         url_components = ['v1', 'datasync', 'sub-key', self.subscribe_key, 'pub-key', self.publish_key, 'obj-id', object_id, path]
@@ -705,7 +705,7 @@ class PubnubBase(object):
 
         def _error(message):
             if error_callback is None:
-                ready_callback(message, self.ds_action_list)
+                ready_callback({ "error" : True, "message" : message }, self.ds_action_list)
             else:
                 error_callback(message, self.ds_action_list)
             self.ds_action_list = []
