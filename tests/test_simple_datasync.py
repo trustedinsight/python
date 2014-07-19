@@ -18,7 +18,7 @@ def async(request):
     return threading.Event()
 
 class TestSimpleDataSync():
-    object = {}
+    data = {}
 
     def asyncTest(fn):
         """
@@ -40,7 +40,7 @@ class TestSimpleDataSync():
 
         def callback(message, action_list):
             print "DataSync callback:", message, action_list
-            self.object = message
+            self.data = message
             async.set()
 
         p.get_synced_object(object_id, callback)
@@ -75,8 +75,8 @@ class TestSimpleDataSync():
         })
         self.wait(async)
 
-        assert 'time' in self.object
-        assert self.object['time'] == now
+        assert 'time' in self.data
+        assert self.data['time'] == now
 
     @asyncTest
     def test_merge(self, async):
@@ -87,12 +87,12 @@ class TestSimpleDataSync():
         })
         self.wait(async)
 
-        assert 'time' in self.object
-        assert self.object['time'] == now
+        assert 'time' in self.data
+        assert self.data['time'] == now
 
     @asyncTest
     def test_delete(self, async):
         p.delete(object_id)
         self.wait(async)
 
-        assert self.object == {}
+        assert self.data == {}
