@@ -722,7 +722,7 @@ class PubnubBase(object):
             if message:
                 self.ds_action_list.append(message)
 
-            if self.timetoken > self.ds_timetoken:
+            if self.timetoken >= self.ds_timetoken:
                 self.ds_timetoken = self.timetoken
                 if channel.startswith('pn_ds_'):
                     if message['action'] == 'update':
