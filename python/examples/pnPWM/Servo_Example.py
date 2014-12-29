@@ -2,13 +2,14 @@
 
 from Adafruit_PWM_Servo_Driver import PWM
 import time
+import random
 
 # ===========================================================================
 # Example Code
 # ===========================================================================
 
 # Initialise the PWM device using the default address
-pwm = PWM(0x40, debug=True)
+pwm = PWM(0x40, debug=False)
 # Note if you'd like more debug output you can instead run:
 #pwm = PWM(0x40, debug=True)
 
@@ -30,9 +31,9 @@ while (True):
     for x in range(0,15) :
         # Change speed of continuous servo on channel O
      	pwm.setPWM(x, x, servoMin)
- 	time.sleep(0.0001)
+ 	time.sleep(random.uniform(0.005,0.0001))
   	pwm.setPWM(x, x, servoMax)
-  	time.sleep(0.0001)
+ 	time.sleep(random.uniform(0.005,0.0001))
 
 
 
