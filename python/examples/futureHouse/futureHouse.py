@@ -3,6 +3,10 @@ from Pubnub import Pubnub
 from Adafruit_PWM_Servo_Driver import PWM
 import time
 import random
+import Adafruit_BMP.BMP085 as BMP085
+import Adafruit_DHT
+
+sensor = BMP085.BMP085()
 
 publish_key = len(sys.argv) > 1 and sys.argv[1] or 'demo-36'
 subscribe_key = len(sys.argv) > 2 and sys.argv[2] or 'demo-36'
@@ -15,15 +19,20 @@ pubnub = Pubnub(publish_key=publish_key, subscribe_key=subscribe_key,
 
 channel = 'futureHouse'
 
+# pulse lengths have a max of 4096
+
 leds = [
     {'name': 'iceCaveLamp', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005},
     {'name': 'iceCaveCrystal', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005},
+    {'name': 'fireplaceOrange', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005},
     {'name': 'campfire', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005},
     {'name': 'porchLight', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005},
-    {'name': 'stove', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005},
     {'name': 'fireplaceRed', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005},
-    {'name': 'fireplaceOrange', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005}
+    {'name': 'stove', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005}
 ]
+
+
+
 
 def callback(message, channel):
 
@@ -42,6 +51,26 @@ def callback(message, channel):
             print "Setting waitFloor to: " + str(message['waitFloor'])
             leds[message['ledID']]['waitFloor'] = message['waitFloor']
 
+    if 'getEnviro' in message:
+        enviro = {}
+        enviro['temp1'] = '{0:0.2f} *C'.format(sensor.read_temperature())
+        enviro['pres1'] = '{0:0.2f} Pa'.format(sensor.read_pressure())
+        enviro['alt1']  = '{0:0.2f} m'.format(sensor.read_altitude())
+        enviro['pres2'] = '{0:0.2f} Pa'.format(sensor.read_sealevel_pressure())
+        enviro['humidity1'], enviro['temp2'] = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
+
+        def pubMessage(message):
+            print(message)
+
+        pubnub.publish(channel, enviro, callback=pubMessage, error=pubMessage)
+
+
+        # print "Sending Environmental Stats"
+        # print 'Temp = {0:0.2f} *C'.format(sensor.read_temperature())
+        # print 'Pressure = {0:0.2f} Pa'.format(sensor.read_pressure())
+        # print 'Altitude = {0:0.2f} m'.format(sensor.read_altitude())
+        # print 'Sealevel Pressure = {0:0.2f} Pa'.format(sensor.read_sealevel_pressure())
+        #
 
 
 def error(message):
