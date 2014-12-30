@@ -31,16 +31,16 @@ def callback(message, channel):
     if 'ledID' in message:
         if 'value' in message:
             if 'minPulseLength' in message:
-                print "Setting minPulseLength to: " %(message['minPulseLength'])
+                print "Setting minPulseLength to: " + str(message['minPulseLength'])
                 leds[message['ledID']]['minPulseLength'] = message['minPulseLength']
             if 'maxPulseLength' in message:
-                print "Setting maxPulseLength to: " %(message['maxPulseLength'])
+                print "Setting maxPulseLength to: " + str(message['maxPulseLength'])
                 leds[message['ledID']]['maxPulseLength'] = message['maxPulseLength']
             if 'waitCeiling' in message:
-                print "Setting waitCeiling to: " %(message['waitCeiling'])
+                print "Setting waitCeiling to: " + str(message['waitCeiling'])
                 leds[message['ledID']]['waitCeiling'] = message['waitCeiling']
             if 'waitFloor' in message:
-                print "Setting waitFloor to: " %(message['waitFloor'])
+                print "Setting waitFloor to: " + str(message['waitFloor'])
                 leds[message['ledID']]['waitFloor'] = message['waitFloor']
 
 
