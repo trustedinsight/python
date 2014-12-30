@@ -10,22 +10,43 @@ secret_key = len(sys.argv) > 3 and sys.argv[3] or 'demo-36'
 cipher_key = len(sys.argv) > 4 and sys.argv[4] or ''
 ssl_on = len(sys.argv) > 5 and bool(sys.argv[5]) or False
 
-## -----------------------------------------------------------------------
-## Initiate Pubnub State
-## -----------------------------------------------------------------------
 pubnub = Pubnub(publish_key=publish_key, subscribe_key=subscribe_key,
                 secret_key=secret_key, cipher_key=cipher_key, ssl_on=ssl_on)
 
 channel = 'futureHouse'
 
+leds = [
+    {'name': 'iceCaveLamp', 'minPulseLength': 150, 'maxPulseLength': 2150},
+    {'name': 'iceCaveCrystal', 'minPulseLength': 150, 'maxPulseLength': 2150},
+    {'name': 'campfire', 'minPulseLength': 150, 'maxPulseLength': 2150},
+    {'name': 'porchLight', 'minPulseLength': 150, 'maxPulseLength': 2150},
+    {'name': 'stove', 'minPulseLength': 150, 'maxPulseLength': 2150},
+    {'name': 'fireplaceRed', 'minPulseLength': 150, 'maxPulseLength': 2150},
+    {'name': 'fireplaceOrange', 'minPulseLength': 150, 'maxPulseLength': 2150},
+]
 
-# Asynchronous usage
 def callback(message, channel):
     print(message)
+    # LED Setters
+    if 'ledID' in message:
+        if 'value' in message:
+            if 'minPulseLength' in message:
+                print "Setting minPulseLength to: " %(message['minPulseLength'])
+                leds[message['ledID']]['minPulseLength'] = message['minPulseLength']
+            if 'maxPulseLength' in message:
+                print "Setting maxPulseLength to: " %(message['maxPulseLength'])
+                leds[message['ledID']]['maxPulseLength'] = message['maxPulseLength']
+            if 'waitCeiling' in message:
+                print "Setting waitCeiling to: " %(message['waitCeiling'])
+                leds[message['ledID']]['waitCeiling'] = message['waitCeiling']
+            if 'waitFloor' in message:
+                print "Setting waitFloor to: " %(message['waitFloor'])
+                leds[message['ledID']]['waitFloor'] = message['waitFloor']
+
 
 
 def error(message):
-    print("ERROR : " + str(message))
+    print("ERROR : " + (message))
 
 
 def connect(message):
@@ -47,9 +68,6 @@ pubnub.subscribe(channel, callback=callback, error=callback,
 # Initialise the PWM device using the default address
 pwm = PWM(0x40, debug=False)
 
-ledMin = 150  # Min pulse length out of 4096
-ledMax = 600  # Max pulse length out of 4096
-
 def setServoPulse(channel, pulse):
     pulseLength = 1000000                   # 1,000,000 us per second
     pulseLength /= 60                       # 60 Hz
@@ -64,9 +82,7 @@ pwm.setPWMFreq(60)                        # Set frequency to 60 Hz
 while (True):
     for x in range(0,6) :
         # Change speed of continuous servo on channel O
-        pwm.setPWM(x, 0, ledMin)
+        pwm.setPWM(x, 0, leds[x]['minPulseLength'])
         time.sleep(random.uniform(0.005,0.0001))
-        pwm.setPWM(x, 0, ledMax)
+        pwm.setPWM(x, 0, leds[x]['maxPulseLength'])
         time.sleep(random.uniform(0.005,0.0001))
-
-
