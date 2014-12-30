@@ -39,7 +39,8 @@ def reconnect(message):
 def disconnect(message):
     print("DISCONNECTED")
 
-
+pubnub.subscribe(channel, callback=callback, error=callback,
+                 connect=connect, reconnect=reconnect, disconnect=disconnect)
 
 # http://www.raspberrypi.org/forums/viewtopic.php?f=37&t=32826
 
@@ -68,5 +69,4 @@ while (True):
         pwm.setPWM(x, 0, ledMax)
         time.sleep(random.uniform(0.005,0.0001))
 
-pubnub.subscribe(channel, callback=callback, error=callback,
-                 connect=connect, reconnect=reconnect, disconnect=disconnect)
+
