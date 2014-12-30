@@ -49,6 +49,8 @@ def callback(message, channel):
 
     # LED Setters
     if 'ledID' in message:
+        print "message received for LED: " + leds[message['ledID']].name
+
         if 'minPulseLength' in message:
             print "Setting minPulseLength to: " + str(message['minPulseLength'])
             leds[message['ledID']]['minPulseLength'] = message['minPulseLength']
