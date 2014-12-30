@@ -68,7 +68,7 @@ def callback(message, channel):
         pubnub.publish(channel, leds, callback=pubMessage, error=pubMessage)
 
 
-if 'getEnviro' in message:
+    if 'getEnviro' in message:
         enviro = {}
         enviro['temp1'] = '{0:0.2f} *C'.format(sensor.read_temperature())
         enviro['pres1'] = '{0:0.2f} Pa'.format(sensor.read_pressure())
