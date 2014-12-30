@@ -26,10 +26,6 @@ leds = [
 ]
 
 def callback(message, channel):
-    for x in message:
-        print (x)
-        for y in message[x]:
-            print (y, ':', message[x][y])
 
     # LED Setters
     if 'ledID' in message:
