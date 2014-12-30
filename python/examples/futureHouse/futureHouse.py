@@ -9,6 +9,15 @@ import RPi.GPIO as GPIO
 
 sensor = BMP085.BMP085()
 
+GPIO.setmode(GPIO.BOARD)
+StepPins = [26,24,22,19]
+
+for pin in StepPins:
+    print "Setup pins"
+    GPIO.setup(pin,GPIO.OUT)
+    GPIO.output(pin, False)
+
+
 publish_key = len(sys.argv) > 1 and sys.argv[1] or 'demo-36'
 subscribe_key = len(sys.argv) > 2 and sys.argv[2] or 'demo-36'
 secret_key = len(sys.argv) > 3 and sys.argv[3] or 'demo-36'
@@ -17,6 +26,7 @@ ssl_on = len(sys.argv) > 5 and bool(sys.argv[5]) or False
 
 pubnub = Pubnub(publish_key=publish_key, subscribe_key=subscribe_key,
                 secret_key=secret_key, cipher_key=cipher_key, ssl_on=ssl_on)
+
 
 channel = 'futureHouse'
 
@@ -65,13 +75,6 @@ def callback(message, channel):
 
         pubnub.publish(channel, enviro, callback=pubMessage, error=pubMessage)
 
-
-        # print "Sending Environmental Stats"
-        # print 'Temp = {0:0.2f} *C'.format(sensor.read_temperature())
-        # print 'Pressure = {0:0.2f} Pa'.format(sensor.read_pressure())
-        # print 'Altitude = {0:0.2f} m'.format(sensor.read_altitude())
-        # print 'Sealevel Pressure = {0:0.2f} Pa'.format(sensor.read_sealevel_pressure())
-        #
     if 'openDoor' in message:
         moveDoor("open")
     elif 'closeDoor' in message:
@@ -99,14 +102,6 @@ pubnub.subscribe(channel, callback=callback, error=callback,
 # http://www.raspberrypi.org/forums/viewtopic.php?f=37&t=32826
 
 def moveDoor(direction):
-    GPIO.setmode(GPIO.BOARD)
-    StepPins = [26,24,22,19]
-
-    # Set all pins as output
-    for pin in StepPins:
-        print "Setup pins"
-        GPIO.setup(pin,GPIO.OUT)
-        GPIO.output(pin, False)
 
     stepCount = 8
     globalcount = 1600
