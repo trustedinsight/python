@@ -81,7 +81,7 @@ def setServoPulse(channel, pulse):
 pwm.setPWMFreq(60)                        # Set frequency to 60 Hz
 while (True):
     for x in range(0,6) :
-        print str(leds[x]['minPulseLength']) + " " + str(leds[x]['maxPulseLength']) + " " + str(leds[x]['waitFloor']) + " " + str(leds[x]['waitCeiling'])
+        print str(x) + ": " + str(leds[x]['minPulseLength']) + " " + str(leds[x]['maxPulseLength']) + " " + str(leds[x]['waitFloor']) + " " + str(leds[x]['waitCeiling'])
         # Change speed of continuous servo on channel O
         pwm.setPWM(x, 0, leds[x]['minPulseLength'])
         time.sleep(random.uniform(leds[x]['waitCeiling'],leds[x]['waitFloor']))
