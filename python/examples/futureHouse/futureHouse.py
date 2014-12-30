@@ -42,13 +42,14 @@ leds = [
     {'name': 'stove', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005}
 ]
 
-
-
+def pubMessage(message):
+    print(message)
 
 def callback(message, channel):
 
     # LED Setters
     if 'ledID' in message:
+
         print "message received for LED: " + leds[message['ledID']]['name']
 
         if 'minPulseLength' in message:
@@ -64,16 +65,16 @@ def callback(message, channel):
             print "Setting waitFloor to: " + str(message['waitFloor'])
             leds[message['ledID']]['waitFloor'] = message['waitFloor']
 
-    if 'getEnviro' in message:
+        pubnub.publish(channel, leds, callback=pubMessage, error=pubMessage)
+
+
+if 'getEnviro' in message:
         enviro = {}
         enviro['temp1'] = '{0:0.2f} *C'.format(sensor.read_temperature())
         enviro['pres1'] = '{0:0.2f} Pa'.format(sensor.read_pressure())
         enviro['alt1']  = '{0:0.2f} m'.format(sensor.read_altitude())
         enviro['pres2'] = '{0:0.2f} Pa'.format(sensor.read_sealevel_pressure())
         enviro['humidity1'], enviro['temp2'] = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
-
-        def pubMessage(message):
-            print(message)
 
         pubnub.publish(channel, enviro, callback=pubMessage, error=pubMessage)
 
