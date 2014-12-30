@@ -15,7 +15,7 @@ StepPins = [26,24,22,19]
 for pin in StepPins:
     print "Setup pins"
     GPIO.setup(pin,GPIO.OUT)
-    GPIO.output(pin, False)
+    GPIO.output(pin, True)
 
 
 publish_key = len(sys.argv) > 1 and sys.argv[1] or 'demo-36'
