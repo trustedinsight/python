@@ -16,13 +16,13 @@ pubnub = Pubnub(publish_key=publish_key, subscribe_key=subscribe_key,
 channel = 'futureHouse'
 
 leds = [
-    {'name': 'iceCaveLamp', 'minPulseLength': 150, 'maxPulseLength': 2150},
-    {'name': 'iceCaveCrystal', 'minPulseLength': 150, 'maxPulseLength': 2150},
-    {'name': 'campfire', 'minPulseLength': 150, 'maxPulseLength': 2150},
-    {'name': 'porchLight', 'minPulseLength': 150, 'maxPulseLength': 2150},
-    {'name': 'stove', 'minPulseLength': 150, 'maxPulseLength': 2150},
-    {'name': 'fireplaceRed', 'minPulseLength': 150, 'maxPulseLength': 2150},
-    {'name': 'fireplaceOrange', 'minPulseLength': 150, 'maxPulseLength': 2150},
+    {'name': 'iceCaveLamp', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005},
+    {'name': 'iceCaveCrystal', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005},
+    {'name': 'campfire', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005},
+    {'name': 'porchLight', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005},
+    {'name': 'stove', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005},
+    {'name': 'fireplaceRed', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005},
+    {'name': 'fireplaceOrange', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005}
 ]
 
 def callback(message, channel):
@@ -81,8 +81,9 @@ def setServoPulse(channel, pulse):
 pwm.setPWMFreq(60)                        # Set frequency to 60 Hz
 while (True):
     for x in range(0,6) :
+        print str(leds[x]['minPulseLength']) + " " + str(leds[x]['maxPulseLength']) + " " + str(leds[x]['waitFloor']) + " " + str(leds[x]['waitCeiling'])
         # Change speed of continuous servo on channel O
         pwm.setPWM(x, 0, leds[x]['minPulseLength'])
-        time.sleep(random.uniform(0.005,0.0001))
+        time.sleep(random.uniform(leds[x]['waitCeiling'],leds[x]['waitFloor']))
         pwm.setPWM(x, 0, leds[x]['maxPulseLength'])
-        time.sleep(random.uniform(0.005,0.0001))
+        time.sleep(random.uniform(leds[x]['waitCeiling'],leds[x]['waitFloor']))
