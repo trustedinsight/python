@@ -5,6 +5,7 @@ import time
 import random
 import Adafruit_BMP.BMP085 as BMP085
 import Adafruit_DHT
+import RPi.GPIO as GPIO
 
 sensor = BMP085.BMP085()
 
@@ -71,6 +72,10 @@ def callback(message, channel):
         # print 'Altitude = {0:0.2f} m'.format(sensor.read_altitude())
         # print 'Sealevel Pressure = {0:0.2f} Pa'.format(sensor.read_sealevel_pressure())
         #
+    if 'openDoor' in message:
+        moveDoor("open")
+    elif 'closeDoor' in message:
+        moveDoor("close")
 
 
 def error(message):
@@ -93,19 +98,84 @@ pubnub.subscribe(channel, callback=callback, error=callback,
 
 # http://www.raspberrypi.org/forums/viewtopic.php?f=37&t=32826
 
+def moveDoor(direction):
+    GPIO.setmode(GPIO.BOARD)
+    StepPins = [26,24,22,19]
+
+    # Set all pins as output
+    for pin in StepPins:
+        print "Setup pins"
+        GPIO.setup(pin,GPIO.OUT)
+        GPIO.output(pin, False)
+
+    stepCount = 8
+    globalcount = 1600
+    cycles = 0
+    stepCounter = 0
+    waitTime = 0.000001
+
+    openSeq = range(0, stepCount)
+    openSeq[0] = [1,0,0,0]
+    openSeq[1] = [1,1,0,0]
+    openSeq[2] = [0,1,0,0]
+    openSeq[3] = [0,1,1,0]
+    openSeq[4] = [0,0,1,0]
+    openSeq[5] = [0,0,1,1]
+    openSeq[6] = [0,0,0,1]
+    openSeq[7] = [1,0,0,1]
+
+    closeSeq = range(0, stepCount)
+    closeSeq[7] = [1,0,0,0]
+    closeSeq[6] = [1,1,0,0]
+    closeSeq[5] = [0,1,0,0]
+    closeSeq[4] = [0,1,1,0]
+    closeSeq[3] = [0,0,1,0]
+    closeSeq[2] = [0,0,1,1]
+    closeSeq[1] = [0,0,0,1]
+    closeSeq[0] = [1,0,0,1]
+
+    # Choose a sequence to use
+
+    if direction == "open":
+        seq = openSeq
+    elif direction == "close":
+        seq = closeSeq
+    else:
+        return
+
+    # Start main loop
+    while 1==1:
+        for pin in range(0, 4):
+            xpin = StepPins[pin]
+
+            pinVal = seq[stepCounter][pin]
+
+            if pinVal!=0:
+                #print " Step %i Enable %i" %(StepCounter,xpin)
+                GPIO.output(xpin, True)
+            else:
+                GPIO.output(xpin, False)
+
+        stepCounter += 1
+        cycles +=1
+
+        #print " Stepcounter: %i" %(StepCounter)
+        # If we reach the end of the sequence
+        # start again
+        if (stepCounter==stepCount):
+            stepCounter = 0
+
+        if (stepCounter<0):
+            stepCounter = stepCount
+
+        if (globalcount == cycles):
+            sys.exit()
+
+        # Wait before moving on
+        time.sleep(waitTime)
+
 # Initialise the PWM device using the default address
 pwm = PWM(0x40, debug=False)
-
-def setServoPulse(channel, pulse):
-    pulseLength = 1000000                   # 1,000,000 us per second
-    pulseLength /= 60                       # 60 Hz
-    print "%d us per period" % pulseLength
-    pulseLength /= 4096                     # 12 bits of resolution
-    print "%d us per bit" % pulseLength
-    pulse *= 1000
-    pulse /= pulseLength
-    pwm.setPWM(channel, 0, pulse)
-
 pwm.setPWMFreq(60)                        # Set frequency to 60 Hz
 while (True):
     for x in range(0,7) :
