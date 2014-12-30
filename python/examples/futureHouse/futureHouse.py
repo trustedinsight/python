@@ -29,19 +29,18 @@ def callback(message, channel):
 
     # LED Setters
     if 'ledID' in message:
-        if 'value' in message:
-            if 'minPulseLength' in message:
-                print "Setting minPulseLength to: " + str(message['minPulseLength'])
-                leds[message['ledID']]['minPulseLength'] = message['minPulseLength']
-            if 'maxPulseLength' in message:
-                print "Setting maxPulseLength to: " + str(message['maxPulseLength'])
-                leds[message['ledID']]['maxPulseLength'] = message['maxPulseLength']
-            if 'waitCeiling' in message:
-                print "Setting waitCeiling to: " + str(message['waitCeiling'])
-                leds[message['ledID']]['waitCeiling'] = message['waitCeiling']
-            if 'waitFloor' in message:
-                print "Setting waitFloor to: " + str(message['waitFloor'])
-                leds[message['ledID']]['waitFloor'] = message['waitFloor']
+        if 'minPulseLength' in message:
+            print "Setting minPulseLength to: " + str(message['minPulseLength'])
+            leds[message['ledID']]['minPulseLength'] = message['minPulseLength']
+        if 'maxPulseLength' in message:
+            print "Setting maxPulseLength to: " + str(message['maxPulseLength'])
+            leds[message['ledID']]['maxPulseLength'] = message['maxPulseLength']
+        if 'waitCeiling' in message:
+            print "Setting waitCeiling to: " + str(message['waitCeiling'])
+            leds[message['ledID']]['waitCeiling'] = message['waitCeiling']
+        if 'waitFloor' in message:
+            print "Setting waitFloor to: " + str(message['waitFloor'])
+            leds[message['ledID']]['waitFloor'] = message['waitFloor']
 
 
 
@@ -81,7 +80,7 @@ def setServoPulse(channel, pulse):
 pwm.setPWMFreq(60)                        # Set frequency to 60 Hz
 while (True):
     for x in range(0,7) :
-        print str(x) + ": " + str(leds[x]['minPulseLength']) + " " + str(leds[x]['maxPulseLength']) + " " + str(leds[x]['waitFloor']) + " " + str(leds[x]['waitCeiling'])
+        # print str(x) + ": " + str(leds[x]['minPulseLength']) + " " + str(leds[x]['maxPulseLength']) + " " + str(leds[x]['waitFloor']) + " " + str(leds[x]['waitCeiling'])
         # Change speed of continuous servo on channel O
         pwm.setPWM(x, 0, leds[x]['minPulseLength'])
         time.sleep(random.uniform(leds[x]['waitCeiling'],leds[x]['waitFloor']))
