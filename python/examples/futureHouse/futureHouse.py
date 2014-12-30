@@ -154,7 +154,7 @@ def moveDoor(direction):
         stepCounter += 1
         cycles +=1
 
-        print " Stepcounter: %i" %(StepCounter)
+        print " Stepcounter: %i" %(stepCounter)
         # If we reach the end of the sequence
         # start again
         if (stepCounter==stepCount):
