@@ -7,12 +7,17 @@ import Adafruit_BMP.BMP085 as BMP085
 import Adafruit_DHT
 import RPi.GPIO as GPIO
 
+# Initialize Humid / Temp
+
 sensor = BMP085.BMP085()
 
-GPIO.setmode(GPIO.BOARD)
-StepPins = [26,24,22,19]
+# Initialize Stepper
 
-for pin in StepPins:
+GPIO.setmode(GPIO.BOARD)
+stepPins = [26,24,22,19]
+waitTime = 0.000001
+
+for pin in stepPins:
     print "Setup pins"
     GPIO.setup(pin,GPIO.OUT)
     GPIO.output(pin, True)
@@ -106,47 +111,47 @@ pubnub.subscribe(channel, callback=callback, error=callback,
 
 def moveDoor(direction):
 
-    stepCount = 8
-    globalcount = 1600
-    cycles = 0
     stepCounter = 0
-    waitTime = 0.000001
+    stepCount = 8
 
-    openSeq = range(0, stepCount)
-    openSeq[0] = [1,0,0,0]
-    openSeq[1] = [1,1,0,0]
-    openSeq[2] = [0,1,0,0]
-    openSeq[3] = [0,1,1,0]
-    openSeq[4] = [0,0,1,0]
-    openSeq[5] = [0,0,1,1]
-    openSeq[6] = [0,0,0,1]
-    openSeq[7] = [1,0,0,1]
-
-    closeSeq = range(0, stepCount)
-    closeSeq[7] = [1,0,0,0]
-    closeSeq[6] = [1,1,0,0]
-    closeSeq[5] = [0,1,0,0]
-    closeSeq[4] = [0,1,1,0]
-    closeSeq[3] = [0,0,1,0]
-    closeSeq[2] = [0,0,1,1]
-    closeSeq[1] = [0,0,0,1]
-    closeSeq[0] = [1,0,0,1]
-
-    # Choose a sequence to use
+    Seq = []
+    Seq = range(0, stepCount)
 
     if direction == "open":
-        seq = openSeq
+
+        Seq[0] = [1,0,0,0]
+        Seq[1] = [1,1,0,0]
+        Seq[2] = [0,1,0,0]
+        Seq[3] = [0,1,1,0]
+        Seq[4] = [0,0,1,0]
+        Seq[5] = [0,0,1,1]
+        Seq[6] = [0,0,0,1]
+        Seq[7] = [1,0,0,1]
+
     elif direction == "close":
-        seq = closeSeq
+
+        Seq[7] = [1,0,0,0]
+        Seq[6] = [1,1,0,0]
+        Seq[5] = [0,1,0,0]
+        Seq[4] = [0,1,1,0]
+        Seq[3] = [0,0,1,0]
+        Seq[2] = [0,0,1,1]
+        Seq[1] = [0,0,0,1]
+        Seq[0] = [1,0,0,1]
+
     else:
         return
 
-    # Start main loop
-    while 1==1:
-        for pin in range(0, 4):
-            xpin = StepPins[pin]
+    maxSteps = 1600
+    completedSteps = 0
 
-            pinVal = seq[stepCounter][pin]
+    # Start main loop
+    while completedSteps != maxSteps:
+
+        for pin in range(0, 4):
+            xpin = stepPins[pin]
+
+            pinVal = Seq[stepCounter][pin]
 
             if pinVal!=0:
                 #print " Step %i Enable %i" %(StepCounter,xpin)
@@ -155,22 +160,17 @@ def moveDoor(direction):
                 GPIO.output(xpin, False)
 
         stepCounter += 1
-        cycles +=1
+        completedSteps +=1
 
         print " Stepcounter: %i" %(stepCounter)
-        # If we reach the end of the sequence
-        # start again
         if (stepCounter==stepCount):
             stepCounter = 0
 
         if (stepCounter<0):
             stepCounter = stepCount
 
-        if (globalcount == cycles):
-            sys.exit()
-
-        # Wait before moving on
         time.sleep(waitTime)
+
 
 # Initialise the PWM device using the default address
 pwm = PWM(0x40, debug=False)
