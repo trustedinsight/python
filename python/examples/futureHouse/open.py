@@ -31,7 +31,7 @@ maxSteps = 1600
 completedSteps = 0
  
 # Start main loop
-while 1==1:
+while completedSteps != maxSteps:
  
   for pin in range(0, 4):
     xpin = stepPins[pin]
@@ -53,8 +53,5 @@ while 1==1:
 
   if (stepCounter<0):
     stepCounter = stepCount
-
-  if (maxSteps == completedSteps):
-   sys.exit()
 
   time.sleep(waitTime)
