@@ -15,30 +15,27 @@ $(function () {
         canvas.width = w = window.innerWidth * 0.9;
         canvas.height = h = window.innerHeight * 0.9;
 
-        var zeroHeight = h * 0.85;
-        var zeroWidth = w * 0.85;
-
-        var osc1 = new osc(100, 0, 0.05);
-        var horizon = h * 0.8; // the bigger this gets, the lower the wave offsets
-        var count = 100; // 40
-        var step = 10; //Math.ceil(w / count);
+        var osc1 = new osc(0, 400, 0.09);
+        var horizon = h * 0.4; // the bigger this gets, the lower the wave offsets
+        var count = 1000; // 40
+        var step = 1; //Math.ceil(w / count);
         var buffer = new ArrayBuffer(count * 4);
         var points = new Float32Array(buffer);
 
-// Change wave amplitude
-//osc1.max = 450;
-//osc1.min = -450;
+        // Change wave amplitude
+        //osc1.max = 450;
+        //osc1.min = -450;
 
-// Change wait time
-//osc1.speed = 0.2
+        // Change wait time
+        //osc1.speed = 0.2
 
         function fill() {
             for (var i = 0; i < count; i++) {
-                points[i] = mixer(osc1);
+                points[i] = osc1.getAmp();
             }
         }
 
-        ctx.lineWidth = 5;
+        ctx.lineWidth = 1;
         ctx.strokeStyle = '#ffffff';
         ctx.fillStyle = 'rgb(50, 50, 80)';
 
@@ -52,7 +49,7 @@ $(function () {
             }
 
             /// get a new point
-            points[count - 1] = mixer(osc1) //, osc2, osc3);
+            points[count - 1] = osc1.getAmp(); //, osc2, osc3);
 
             //ctx.clearRect(0, 0, w, h);
            ctx.fillRect(0, 0, w, h);
@@ -68,6 +65,8 @@ $(function () {
             ctx.strokeStyle = '#ffffff';
             ctx.stroke();
 
+            // 0
+
             ctx.beginPath();
             ctx.moveTo(10, h - 10);
             ctx.lineTo(w, h - 10);
@@ -80,7 +79,7 @@ $(function () {
         loop();
 
 /// oscillator object
-        function osc(maxx, minn, spd) {
+        function osc(minn, maxx, spd) {
 
             this.max = maxx;
             this.min = minn;
@@ -100,7 +99,9 @@ $(function () {
                 }
 
                 //return max * Math.sin(a * Math.PI);
-                return a < 1 ? min : max;
+                var waveVal = a < 1 ? this.min : this.max;
+                console.log(waveVal);
+                return  waveVal;
             }
 
             function getMax() {
@@ -114,26 +115,5 @@ $(function () {
             return this;
         }
 
-        function mixer(osc) {
-
-            var d = arguments.length,
-                i = d,
-                sum = 0;
-
-            if (d < 1) return 0;
-
-            while (i--) sum += arguments[i].getAmp();
-
-//            console.log("1: " + osc.getAmp());
-//            console.log("2: " + sum);
-//            console.log("3: " + d + horizon);
-//            console.log("4: " + horizon);
-
-            // return osc.getAmp() + horizon;
-            return sum / d + horizon;
-            //return arguments[i].getAmp() + horizon;
-
-
-        }
     }
 )
