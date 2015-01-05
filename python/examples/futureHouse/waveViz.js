@@ -34,6 +34,16 @@ $(function () {
         ctx.strokeStyle = '#ffffff';
         ctx.fillStyle = 'rgb(50, 50, 80)';
 
+        $("#minPulseLength").on('keydown', function (e) {
+
+            if (e.keyCode == 13) {
+                var v = $("#minPulseLength").val();
+                osc1.min = v;
+                console.log("minP: " + v);
+            }
+
+        });
+
         function loop() {
 
             var i;
@@ -99,7 +109,7 @@ $(function () {
 
                 //return max * Math.sin(a * Math.PI);
                 var waveVal = a < 1 ? this.min : this.max;
-                console.log(waveVal);
+                // console.log(waveVal);
                 return  waveVal;
             }
 
