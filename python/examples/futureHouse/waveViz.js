@@ -15,19 +15,14 @@ $(function () {
         canvas.width = w = window.innerWidth * 0.9;
         canvas.height = h = window.innerHeight * 0.9;
 
+        var hOffset = h - 10;
+        var wOffset = w - 10;
+
         var osc1 = new osc(0, 400, 0.09);
-        var horizon = h * 0.4; // the bigger this gets, the lower the wave offsets
         var count = 1000; // 40
         var step = 1; //Math.ceil(w / count);
         var buffer = new ArrayBuffer(count * 4);
         var points = new Float32Array(buffer);
-
-        // Change wave amplitude
-        //osc1.max = 450;
-        //osc1.min = -450;
-
-        // Change wait time
-        //osc1.speed = 0.2
 
         function fill() {
             for (var i = 0; i < count; i++) {
@@ -65,11 +60,23 @@ $(function () {
             ctx.strokeStyle = '#ffffff';
             ctx.stroke();
 
-            // 0
+
+            for (var z = 0; z < 5; z++) {
+
+            }
+            // 0 line
 
             ctx.beginPath();
-            ctx.moveTo(10, h - 10);
-            ctx.lineTo(w, h - 10);
+            ctx.moveTo(10, hOffset);
+            ctx.lineTo(w, hOffset);
+            ctx.strokeStyle = '#ff0000';
+            ctx.stroke();
+
+            // 1 line
+
+            ctx.beginPath();
+            ctx.moveTo(10, hOffset / 2);
+            ctx.lineTo(w, hOffset / 2);
             ctx.strokeStyle = '#ff0000';
             ctx.stroke();
 
@@ -78,17 +85,18 @@ $(function () {
 
         loop();
 
-/// oscillator object
+        /// oscillator object
         function osc(minn, maxx, spd) {
-
-            this.max = maxx;
-            this.min = minn;
-            this.speed = spd;
 
             var me = this,
                 a = 0,
                 max = getMax(),
-                min = getMin();
+                min = getMin(),
+                speed = 0;
+
+            setMax(maxx);
+            setMin(minn);
+            setSpeed(spd);
 
             this.getAmp = function () {
 
@@ -110,6 +118,18 @@ $(function () {
 
             function getMin() {
                 return me.min;
+            }
+
+            function setMax(x) {
+                me.max = hOffset - x;
+            }
+
+            function setMin(x) {
+                me.min = hOffset - x;
+            }
+
+            function setSpeed(x) {
+                me.speed = x;
             }
 
             return this;
