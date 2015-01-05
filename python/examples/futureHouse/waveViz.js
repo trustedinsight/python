@@ -60,25 +60,16 @@ $(function () {
             ctx.strokeStyle = '#ffffff';
             ctx.stroke();
 
+            var gradients = 5;
+            for (var z = -1; z < gradients; z++) {
 
-            for (var z = 0; z < 5; z++) {
+                ctx.beginPath();
+                ctx.moveTo(10, hOffset - (hOffset / 2 * ((z+1) / gradients)) );
+                ctx.lineTo(w, hOffset - (hOffset / 2  * ((z+1) / gradients)) );
+                ctx.strokeStyle = '#ff0000';
+                ctx.stroke();
 
             }
-            // 0 line
-
-            ctx.beginPath();
-            ctx.moveTo(10, hOffset);
-            ctx.lineTo(w, hOffset);
-            ctx.strokeStyle = '#ff0000';
-            ctx.stroke();
-
-            // 1 line
-
-            ctx.beginPath();
-            ctx.moveTo(10, hOffset / 2);
-            ctx.lineTo(w, hOffset / 2);
-            ctx.strokeStyle = '#ff0000';
-            ctx.stroke();
 
             requestAnimationFrame(loop);
         }
