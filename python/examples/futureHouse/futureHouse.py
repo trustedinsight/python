@@ -123,7 +123,6 @@ def pnSubscribe():
 #     print "Error: unable to start Subscribe thread"
 
 pnSubscribe()
-startCycling()
 
 # http://www.raspberrypi.org/forums/viewtopic.php?f=37&t=32826
 
@@ -214,3 +213,5 @@ def startCycling():
 
 
             cycleLEDs(x)
+
+startCycling()
