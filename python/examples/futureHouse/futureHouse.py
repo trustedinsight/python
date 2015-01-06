@@ -84,6 +84,7 @@ def callback(message, channel):
     if 'getEnviro' in message:
         enviro = {}
         enviro['temp1'] = '{0:0.2f} *C'.format(sensor.read_temperature())
+        enviro['temp1FInt'] = '{0:0.2f}'.format(sensor.read_temperature())
         enviro['pres1'] = '{0:0.2f} Pa'.format(sensor.read_pressure())
         enviro['alt1']  = '{0:0.2f} m'.format(sensor.read_altitude())
         enviro['pres2'] = '{0:0.2f} Pa'.format(sensor.read_sealevel_pressure())
