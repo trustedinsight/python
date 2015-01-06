@@ -39,13 +39,13 @@ channel = 'futureChannel'
 # pulse lengths have a max of 4096
 
 leds = [
-    {'name': 'iceCaveLamp', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005},
-    {'name': 'iceCaveCrystal', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005},
-    {'name': 'fireplaceOrange', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005},
-    {'name': 'campfire', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005},
-    {'name': 'porchLight', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005},
-    {'name': 'fireplaceRed', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005},
-    {'name': 'stove', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005}
+    {'name': 'iceCaveLamp', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005, 'proc': False},
+    {'name': 'iceCaveCrystal', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005, 'proc': False},
+    {'name': 'fireplaceOrange', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005, 'proc': False},
+    {'name': 'campfire', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005, 'proc': False},
+    {'name': 'porchLight', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005, 'proc': False},
+    {'name': 'fireplaceRed', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005, 'proc': False},
+    {'name': 'stove', 'minPulseLength': 150, 'maxPulseLength': 2600, 'waitFloor': 0.0001, 'waitCeiling': 0.005, 'proc': False}
 ]
 
 def pubMessage(message):
@@ -201,23 +201,23 @@ pwm.setPWMFreq(60)                        # Set frequency to 60 Hz
 
 
 def cycleLEDs(x):
+    leds[x]['proc'] = True
     pwm.setPWM(x, 0, leds[x]['minPulseLength'])
     time.sleep(random.uniform(leds[x]['waitCeiling'], leds[x]['waitFloor']))
     pwm.setPWM(x, 0, leds[x]['maxPulseLength'])
     time.sleep(random.uniform(leds[x]['waitCeiling'], leds[x]['waitFloor']))
+    leds[x]['proc'] = False
+
 
 def startCycling():
     while (True):
 
         for x in range(0,7) :
-            # print str(x) + ": " + str(leds[x]['minPulseLength']) + " " + str(leds[x]['maxPulseLength']) + " " + str(leds[x]['waitFloor']) + " " + str(leds[x]['waitCeiling'])
-            # Change speed of continuous servo on channel O
-            try:
-                thread.start_new_thread( cycleLEDs, (x,) )
-            except:
-                print "Error: unable to start LED thread"
 
-
-            #cycleLEDs(x)
+            if (leds[x]['proc'] == False):
+                try:
+                    thread.start_new_thread( cycleLEDs, (x,) )
+                except:
+                    print "Error: unable to start LED thread"
 
 startCycling()
