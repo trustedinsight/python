@@ -182,11 +182,17 @@ def moveDoor(direction):
 # Initialise the PWM device using the default address
 pwm = PWM(0x40, debug=False)
 pwm.setPWMFreq(60)                        # Set frequency to 60 Hz
+
+
+def cycleLEDs(x):
+    pwm.setPWM(x, 0, leds[x]['minPulseLength'])
+    time.sleep(random.uniform(leds[x]['waitCeiling'], leds[x]['waitFloor']))
+    pwm.setPWM(x, 0, leds[x]['maxPulseLength'])
+    time.sleep(random.uniform(leds[x]['waitCeiling'], leds[x]['waitFloor']))
+
+
 while (True):
     for x in range(0,7) :
         # print str(x) + ": " + str(leds[x]['minPulseLength']) + " " + str(leds[x]['maxPulseLength']) + " " + str(leds[x]['waitFloor']) + " " + str(leds[x]['waitCeiling'])
         # Change speed of continuous servo on channel O
-        pwm.setPWM(x, 0, leds[x]['minPulseLength'])
-        time.sleep(random.uniform(leds[x]['waitCeiling'],leds[x]['waitFloor']))
-        pwm.setPWM(x, 0, leds[x]['maxPulseLength'])
-        time.sleep(random.uniform(leds[x]['waitCeiling'],leds[x]['waitFloor']))
+        cycleLEDs(x)
