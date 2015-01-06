@@ -50,7 +50,14 @@ leds = [
 def pubMessage(message):
     print(message)
 
+def getLEDStatus():
+    pubnub.publish(channel, leds, callback=pubMessage, error=pubMessage)
+
 def callback(message, channel):
+
+    # LED Getters
+    if 'getLEDStatus' in message:
+        getLEDStatus()
 
     # LED Setters
     if 'ledID' in message:
@@ -70,7 +77,7 @@ def callback(message, channel):
             print "Setting waitFloor to: " + str(message['waitFloor'])
             leds[message['ledID']]['waitFloor'] = message['waitFloor']
 
-        pubnub.publish(channel, leds, callback=pubMessage, error=pubMessage)
+        getLEDStatus()
 
 
     if 'getEnviro' in message:
