@@ -199,9 +199,7 @@ def startCycling():
             # print str(x) + ": " + str(leds[x]['minPulseLength']) + " " + str(leds[x]['maxPulseLength']) + " " + str(leds[x]['waitFloor']) + " " + str(leds[x]['waitCeiling'])
             # Change speed of continuous servo on channel O
             try:
-                #t = thread.start_new_thread( cycleLEDs, (x,) )
                 t = thread.start_new_thread( cycleLEDs, (x,) )
-                print t.isAlive()
             except:
                 print "Error: unable to start thread"
 
