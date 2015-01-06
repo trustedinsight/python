@@ -113,12 +113,12 @@ def reconnect(message):
 def disconnect(message):
     print("DISCONNECTED")
 
-def pnSubscribe(x):
+def pnSubscribe():
     pubnub.subscribe(channel, callback=callback, error=callback,
                      connect=connect, reconnect=reconnect, disconnect=disconnect)
 
 try:
-    thread.start_new_thread( pnSubscribe, (0,) )
+    thread.start_new_thread( pnSubscribe, () )
 except:
     print "Error: unable to start Subscribe thread"
 
