@@ -33,7 +33,7 @@ pubnub = Pubnub(publish_key=publish_key, subscribe_key=subscribe_key,
                 secret_key=secret_key, cipher_key=cipher_key, ssl_on=ssl_on)
 
 
-channel = 'futureHouse'
+channel = 'futureChannel'
 
 # pulse lengths have a max of 4096
 
