@@ -1,7 +1,7 @@
 import sys
 from Pubnub import Pubnub
 from Adafruit_PWM_Servo_Driver import PWM
-import threading
+import thread
 import time
 import random
 import Adafruit_BMP.BMP085 as BMP085
@@ -200,7 +200,7 @@ def startCycling():
             # Change speed of continuous servo on channel O
             try:
                 #t = thread.start_new_thread( cycleLEDs, (x,) )
-                t = threading.thread( cycleLEDs, (x,) )
+                t = thread.start_new_thread( cycleLEDs, (x,) )
                 print t.isAlive()
             except:
                 print "Error: unable to start thread"
