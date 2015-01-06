@@ -113,8 +113,14 @@ def reconnect(message):
 def disconnect(message):
     print("DISCONNECTED")
 
-pubnub.subscribe(channel, callback=callback, error=callback,
-                 connect=connect, reconnect=reconnect, disconnect=disconnect)
+def pnSubscribe(x):
+    pubnub.subscribe(channel, callback=callback, error=callback,
+                     connect=connect, reconnect=reconnect, disconnect=disconnect)
+
+try:
+    thread.start_new_thread( pnSubscribe, (0,) )
+except:
+    print "Error: unable to start Subscribe thread"
 
 # http://www.raspberrypi.org/forums/viewtopic.php?f=37&t=32826
 
@@ -199,9 +205,9 @@ def startCycling():
             # print str(x) + ": " + str(leds[x]['minPulseLength']) + " " + str(leds[x]['maxPulseLength']) + " " + str(leds[x]['waitFloor']) + " " + str(leds[x]['waitCeiling'])
             # Change speed of continuous servo on channel O
             try:
-                t = thread.start_new_thread( cycleLEDs, (x,) )
+                thread.start_new_thread( cycleLEDs, (x,) )
             except:
-                print "Error: unable to start thread"
+                print "Error: unable to start LED thread"
 
 
             #cycleLEDs(x)
