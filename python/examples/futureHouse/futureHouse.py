@@ -117,10 +117,12 @@ def pnSubscribe():
     pubnub.subscribe(channel, callback=callback, error=callback,
                      connect=connect, reconnect=reconnect, disconnect=disconnect)
 
-try:
-    thread.start_new_thread( pnSubscribe, () )
-except:
-    print "Error: unable to start Subscribe thread"
+# try:
+#     thread.start_new_thread( pnSubscribe, () )
+# except:
+#     print "Error: unable to start Subscribe thread"
+
+pnSubscribe()
 
 # http://www.raspberrypi.org/forums/viewtopic.php?f=37&t=32826
 
@@ -204,10 +206,10 @@ def startCycling():
         for x in range(0,7) :
             # print str(x) + ": " + str(leds[x]['minPulseLength']) + " " + str(leds[x]['maxPulseLength']) + " " + str(leds[x]['waitFloor']) + " " + str(leds[x]['waitCeiling'])
             # Change speed of continuous servo on channel O
-            try:
-                thread.start_new_thread( cycleLEDs, (x,) )
-            except:
-                print "Error: unable to start LED thread"
+            # try:
+            #     thread.start_new_thread( cycleLEDs, (x,) )
+            # except:
+            #     print "Error: unable to start LED thread"
 
 
-            #cycleLEDs(x)
+            cycleLEDs(x)
