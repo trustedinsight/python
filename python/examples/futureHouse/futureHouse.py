@@ -92,10 +92,16 @@ def callback(message, channel):
         pubnub.publish(channel, enviro, callback=pubMessage, error=pubMessage)
 
     if 'openDoor' in message:
-        moveDoor("open")
-    elif 'closeDoor' in message:
-        moveDoor("close")
+        try:
+            thread.start_new_thread( moveDoor, ("open",) )
+        except:
+            print "Error: unable to open door thread"
 
+    elif 'closeDoor' in message:
+        try:
+            thread.start_new_thread( moveDoor, ("close",) )
+        except:
+            print "Error: unable to close door thread"
 
 def error(message):
     print("ERROR : " + (message))
