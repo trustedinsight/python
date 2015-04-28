@@ -709,7 +709,7 @@ class PubnubBase(object):
             error=self._return_wrapped_callback(error))
 
 
-    def publish(self, channel, message, callback=None, error=None):
+    def publish(self, channel, message,callback=None, error=None, post=False):
         """Publishes data on a channel.
 
         The publish() method is used to send a message to all subscribers of a channel.
@@ -753,17 +753,29 @@ class PubnubBase(object):
         message = self.encrypt(message)
 
         ## Send Message
-        return self._request({"urlcomponents": [
-            'publish',
-            self.publish_key,
-            self.subscribe_key,
-            '0',
-            channel,
-            '0',
-            message
-        ], 'urlparams': {'auth': self.auth_key, 'pnsdk' : self.pnsdk}},
-            callback=self._return_wrapped_callback(callback),
-            error=self._return_wrapped_callback(error))
+        if post is False:
+            return self._request({"urlcomponents": [
+                'publish',
+                self.publish_key,
+                self.subscribe_key,
+                '0',
+                channel,
+                '0',
+                message
+            ], 'urlparams': {'auth': self.auth_key, 'pnsdk' : self.pnsdk}},
+                callback=self._return_wrapped_callback(callback),
+                error=self._return_wrapped_callback(error))
+        else:
+            return self._request({"urlcomponents": [
+                'publish',
+                self.publish_key,
+                self.subscribe_key,
+                '0',
+                channel,
+                '0'
+            ], 'urlparams': {'auth': self.auth_key, 'pnsdk' : self.pnsdk}},
+                callback=self._return_wrapped_callback(callback),
+                error=self._return_wrapped_callback(error), json_post_data=message)            
 
     def presence(self, channel, callback, error=None):
         """Subscribe to presence events on a channel.
@@ -1981,7 +1993,7 @@ class PubnubCore(PubnubCoreAsync):
 
 class HTTPClient:
     def __init__(self, pubnub, url, urllib_func=None,
-                 callback=None, error=None, id=None, timeout=5):
+                 callback=None, error=None, id=None, timeout=5, json_post_data=None, headers=None):
         self.url = url
         self.id = id
         self.callback = callback
@@ -1990,6 +2002,8 @@ class HTTPClient:
         self._urllib_func = urllib_func
         self.timeout = timeout
         self.pubnub = pubnub
+        self.json_post_data = json_post_data
+        self.headers = headers
 
     def cancel(self):
         self.stop = True
@@ -2005,7 +2019,7 @@ class HTTPClient:
         if self._urllib_func is None:
             return
 
-        resp = self._urllib_func(self.url, timeout=self.timeout)
+        resp = self._urllib_func(self.url, timeout=self.timeout, json_post_data=self.json_post_data, headers=self.headers)
         data = resp[0]
         code = resp[1]
 
@@ -2065,9 +2079,12 @@ s = requests.Session()
 #s.mount('https://pubsub.pubnub.com', HTTPAdapter(max_retries=1))
 
 
-def _requests_request(url, timeout=5):
+def _requests_request(url, timeout=5, json_post_data=None, headers=None):
     try:
-        resp = s.get(url, timeout=timeout)
+        if json_post_data is None:
+            resp = s.get(url, timeout=timeout, headers=headers)
+        else:
+            resp = s.post(url, data=json_post_data, headers=headers)
     except requests.exceptions.HTTPError as http_error:
         resp = http_error
     except requests.exceptions.ConnectionError as error:
@@ -2150,21 +2167,21 @@ class Pubnub(PubnubCore):
         thread.daemon = self.daemon
         thread.start()
 
-    def _request_async(self, request, callback=None, error=None, single=False, timeout=5):
+    def _request_async(self, request, callback=None, error=None, single=False, timeout=5, json_post_data=None):
         global _urllib_request
         ## Build URL
         url = self.getUrl(request)
         if single is True:
             id = time.time()
             client = HTTPClient(self, url=url, urllib_func=_urllib_request,
-                                callback=None, error=None, id=id, timeout=timeout)
+                                callback=None, error=None, id=id, timeout=timeout, json_post_data=json_post_data, headers={'user-agent' : self.pnsdk})
             with self.latest_sub_callback_lock:
                 self.latest_sub_callback['id'] = id
                 self.latest_sub_callback['callback'] = callback
                 self.latest_sub_callback['error'] = error
         else:
             client = HTTPClient(self, url=url, urllib_func=_urllib_request,
-                                callback=callback, error=error, timeout=timeout)
+                                callback=callback, error=error, timeout=timeout, json_post_data=json_post_data, headers={'user-agent' : self.pnsdk})
 
         thread = threading.Thread(target=client.run)
         thread.daemon = self.daemon
@@ -2174,12 +2191,12 @@ class Pubnub(PubnubCore):
             client.cancel()
         return abort
 
-    def _request_sync(self, request, timeout=5):
+    def _request_sync(self, request, timeout=5, json_post_data=None):
         global _urllib_request
         ## Build URL
         url = self.getUrl(request)
         ## Send Request Expecting JSONP Response
-        response = _urllib_request(url, timeout=timeout)
+        response = _urllib_request(url, timeout=timeout, json_post_data=json_post_data, headers={'user-agent' : self.pnsdk})
         try:
             resp_json = json.loads(response[0])
         except ValueError:
@@ -2194,11 +2211,11 @@ class Pubnub(PubnubCore):
 
         return resp_json
 
-    def _request(self, request, callback=None, error=None, single=False, timeout=5):
+    def _request(self, request, callback=None, error=None, single=False, timeout=5, json_post_data=None):
         if callback is None:
-            return get_data_for_user(self._request_sync(request, timeout=timeout))
+            return get_data_for_user(self._request_sync(request, timeout=timeout, json_post_data=json_post_data))
         else:
-            self._request_async(request, callback, error, single=single, timeout=timeout)
+            self._request_async(request, callback, error, single=single, timeout=timeout, json_post_data=json_post_data)
 
 # Pubnub Twisted
 
