@@ -28,6 +28,25 @@ pubnub.publish(channel, message, callback=callback, error=callback)
 
 ```
 
+publish supports POST method also. To use POST, pass post=True as parameter to publish method call.
+Default method is GET
+
+```
+channel = 'hello_world'
+message = 'Hello World !!!'
+
+# Synchronous usage
+print pubnub.publish(channel='hello_world', message='Hello World !!!', post=True)
+
+# Asynchronous usage
+
+def callback(message):
+    print(message)
+
+pubnub.publish(channel, message, callback=callback, error=callback, post=True)
+
+```
+
 
 #### SUBSCRIBE
 
