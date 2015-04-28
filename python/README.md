@@ -28,10 +28,14 @@ pubnub.publish(channel, message, callback=callback, error=callback)
 
 ```
 
-publish supports POST method also. To use POST, pass post=True as parameter to publish method call.
-Default method is GET
+publish() also supports the POST method. To use POST, pass post=True as parameter to publish method call.
+(Default method is GET).
 
 ```
+# similar example can be found in the examples dir
+# in the examples directory, you can just run
+# PYTHONPATH=../.. python publish_post.py
+
 channel = 'hello_world'
 message = 'Hello World !!!'
 
