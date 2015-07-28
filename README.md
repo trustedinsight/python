@@ -15,6 +15,8 @@ Examples and instructions for the SDK are available in their acompanying README.
 
 [Twisted - For use with the Python Twisted Framework](python-twisted)
 
+[GAE for Managed VMs Beta Support](gae-vm.asciidoc)
+
 ## Migration and Reversion
 If you need to revert to the previous version of PubNub, run this commandline:
 
