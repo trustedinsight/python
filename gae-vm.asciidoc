@@ -9,7 +9,7 @@ managed vm, add following lines to your Docker file.
  RUN apt-get -y install python-crypto
 ```
 
- To include pubnub in your application, you can use vendoring defined here 
+To include pubnub in your application, you can use vendoring defined here 
 https://cloud.google.com/appengine/docs/python/tools/libraries27#vendoring
 
 Create a directory lib in your application root
