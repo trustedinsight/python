@@ -19,7 +19,6 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
     ),
     install_requires=[
-        'pycrypto>=2.6.1',
         'requests>=2.4.0'
     ],
     zip_safe=False,

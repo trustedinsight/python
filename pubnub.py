@@ -25,7 +25,7 @@ import copy
 from base64 import urlsafe_b64encode
 from base64 import encodestring, decodestring
 import hmac
-from Crypto.Cipher import AES
+#from Crypto.Cipher import AES
 
 try:
     from hashlib import sha256
@@ -217,7 +217,7 @@ class PubnubCrypto2():
     def encrypt(self, key, msg):
         secret = self.getSecret(key)
         Initial16bytes = '0123456789012345'
-        cipher = AES.new(secret[0:32], AES.MODE_CBC, Initial16bytes)
+        cipher = '' #AES.new(secret[0:32], AES.MODE_CBC, Initial16bytes)
         enc = encodestring(cipher.encrypt(self.pad(msg)))
         return enc
 
@@ -226,7 +226,7 @@ class PubnubCrypto2():
         try:
             secret = self.getSecret(key)
             Initial16bytes = '0123456789012345'
-            cipher = AES.new(secret[0:32], AES.MODE_CBC, Initial16bytes)
+            cipher = '' #AES.new(secret[0:32], AES.MODE_CBC, Initial16bytes)
             plain = self.depad(cipher.decrypt(decodestring(msg)))
         except:
             return msg
@@ -254,7 +254,7 @@ class PubnubCrypto3():
 
         secret = self.getSecret(key)
         Initial16bytes = '0123456789012345'
-        cipher = AES.new(secret[0:32], AES.MODE_CBC, Initial16bytes)
+        cipher = '' #AES.new(secret[0:32], AES.MODE_CBC, Initial16bytes)
         return encodestring(
             cipher.encrypt(self.pad(msg.encode('utf-8')))).decode('utf-8')
 
@@ -262,7 +262,7 @@ class PubnubCrypto3():
 
         secret = self.getSecret(key)
         Initial16bytes = '0123456789012345'
-        cipher = AES.new(secret[0:32], AES.MODE_CBC, Initial16bytes)
+        cipher = '' #AES.new(secret[0:32], AES.MODE_CBC, Initial16bytes)
         return (cipher.decrypt(
             decodestring(msg.encode('utf-8')))).decode('utf-8')
 
