@@ -230,7 +230,7 @@ class PubnubCrypto2():
         except:
             return msg
         try:
-            return json.loads(plain)
+            return self.json_loads(plain)
         except SyntaxError:
             return plain
 
@@ -304,6 +304,8 @@ class PubnubBase(object):
         self.auth_key = auth_key
         self.STATE = {}
         self.http_debug = None
+        self.json_encoder = None
+        self.json_decoder = None
 
         if self.ssl:
             self.origin = 'https://' + self.origin
@@ -325,6 +327,18 @@ class PubnubBase(object):
 
         if not isinstance(self.uuid, str):
             raise AttributeError("uuid must be a string")
+
+    def set_json_encoder(self, encoder):
+        self.json_encoder = encoder
+
+    def set_json_decoder(self, decoder):
+        self.json_decoder = decoder
+
+    def json_dumps(self, val):
+        return json.dumps(val, cls=self.json_encoder)
+
+    def json_loads(self, val):
+        return json.loads(val, cls=self.json_decoder)
 
     def set_http_debug(self, func=None):
         self.http_debug = func
@@ -661,10 +675,10 @@ class PubnubBase(object):
             Returns encrypted message if cipher key is set
         """
         if self.cipher_key:
-            message = json.dumps(self.pc.encrypt(
-                self.cipher_key, json.dumps(message)).replace('\n', ''))
+            message = self.json_dumps(self.pc.encrypt(
+                self.cipher_key, self.json_dumps(message)).replace('\n', ''))
         else:
-            message = json.dumps(message)
+            message = self.json_dumps(message)
 
         return message
 
@@ -2492,7 +2506,7 @@ class HTTPClient:
                             is not None):
                         self.pubnub.latest_sub_callback['id'] = 0
                         try:
-                            data = json.loads(data)
+                            data = self.json_loads(data)
                         except ValueError:
                             _invoke(self.pubnub.latest_sub_callback['error'],
                                     {'error': 'json decoding error'})
@@ -2505,7 +2519,7 @@ class HTTPClient:
                                 'callback'], data)
         else:
             try:
-                data = json.loads(data)
+                data = self.json_loads(data)
             except ValueError:
                 _invoke(self.error, {'error': 'json decoding error'})
                 return
@@ -2656,7 +2670,7 @@ class Pubnub(PubnubCore):
         ## Send Request Expecting JSONP Response
         response = _urllib_request(url, timeout=timeout)
         try:
-            resp_json = json.loads(response[0])
+            resp_json = self.json_loads(response[0])
         except ValueError:
             return [0, "JSON Error"]
 
@@ -2779,7 +2793,7 @@ class PubnubTwisted(PubnubCoreAsync):
                 if id != self.id:
                     return None
             try:
-                data = json.loads(data)
+                data = self.json_loads(data)
             except ValueError:
                 try:
                     data = json.loads(data.decode("utf-8"))
@@ -2853,7 +2867,8 @@ class PubnubTornado(PubnubCoreAsync):
         self.pnsdk = 'PubNub-Python-' + 'Tornado' + '/' + self.version
 
     def _request(self, request, callback=None, error=None,
-                 single=False, timeout=15, connect_timeout=5, encoder_map=None):
+                 single=False, timeout=15, connect_timeout=5,
+                 encoder_map=None):
 
         def _invoke(func, data):
             if func is not None:
@@ -2890,7 +2905,7 @@ class PubnubTornado(PubnubCoreAsync):
                     return
 
             try:
-                data = json.loads(body)
+                data = self.json_loads(body)
             except TypeError:
                 try:
                     data = json.loads(body.decode("utf-8"))
