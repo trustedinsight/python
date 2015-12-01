@@ -1,0 +1,80 @@
+from pubnub import Pubnub
+from json import JSONEncoder
+
+
+publish_key 	= 'ds'
+subscribe_key 	= 'ds'
+secret_key  	= 'ds'
+
+cipher_key 		= 'enigma'
+
+ssl 			= False
+
+pubnub = Pubnub(publish_key=publish_key, subscribe_key=subscribe_key,
+                secret_key=secret_key, ssl_on=ssl)
+
+pubnub_enc = Pubnub(publish_key=publish_key, subscribe_key=subscribe_key,
+                secret_key=secret_key, cipher_key=cipher_key, ssl_on=ssl)
+
+channel = 'hello_world'
+
+
+class MyComplexObject(object):
+  """
+  A trivial Python object that has its own special serialized output
+  that for some reason would differ from __repr__.
+  """
+  
+  def __init__(self, arbitrary_value, optional_value=None):
+    self.arbitrary_value = arbitrary_value
+    self.optional_value = optional_value
+    
+  def prepared(self):
+    if self.optional_value:
+      return "{0} ({1})".format(self.arbitrary_value, self.optional_value)
+    else:
+      return self.arbitrary_value
+
+
+class MyEncoder(JSONEncoder):
+  def default(self, o):
+    if isinstance(o, MyComplexObject):
+      return o.prepared()
+    return JSONEncoder.default(self, o)
+    
+    
+complex_object = MyComplexObject('foo', optional_value='bar')
+data = {
+  'object': complex_object,
+  'number': 2,
+  'metadata': {
+      'is_hungry': True,
+      'banana_count': 0
+    }
+  }
+
+pubnub.set_json_encoder(MyEncoder)
+pubnub_enc.set_json_encoder(MyEncoder)
+
+# Synchronous usage
+print pubnub.publish(channel, data)
+
+# Asynchronous usage
+
+def callback(message):
+    print(message)
+
+pubnub.publish(channel, data, callback=callback, error=callback)
+
+
+## WITH ENCRYPTION
+
+# Synchronous usage
+print pubnub_enc.publish(channel, data)
+
+# Asynchronous usage
+
+def callback(message):
+    print(message)
+
+pubnub_enc.publish(channel, data, callback=callback, error=callback)
