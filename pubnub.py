@@ -220,7 +220,7 @@ class PubnubCrypto2():
         enc = encodestring(cipher.encrypt(self.pad(msg)))
         return enc
 
-    def decrypt(self, key, msg):
+    def decrypt(self, key, msg, json_loads=None):
 
         try:
             secret = self.getSecret(key)
@@ -230,7 +230,11 @@ class PubnubCrypto2():
         except:
             return msg
         try:
-            return self.json_loads(plain)
+            if json_loads is not None:
+                return json_loads(plain)
+            else:
+                return json.loads(plain)
+
         except SyntaxError:
             return plain
 
@@ -697,7 +701,8 @@ class PubnubBase(object):
             Returns decrypted message if cipher key is set
         """
         if self.cipher_key:
-            message = self.pc.decrypt(self.cipher_key, message)
+            message = self.pc.decrypt(self.cipher_key, message,
+                                      json_loads=self.json_loads)
 
         return message
 
@@ -1274,6 +1279,7 @@ class PubnubBase(object):
                     len(str(y)) > 0])
         if self.http_debug is not None:
             self.http_debug(url)
+
         return url
 
     def _channel_registry(self, url=None, params=None, callback=None,
@@ -2506,7 +2512,7 @@ class HTTPClient:
                             is not None):
                         self.pubnub.latest_sub_callback['id'] = 0
                         try:
-                            data = self.json_loads(data)
+                            data = self.pubnub.json_loads(data)
                         except ValueError:
                             _invoke(self.pubnub.latest_sub_callback['error'],
                                     {'error': 'json decoding error'})
@@ -2519,7 +2525,7 @@ class HTTPClient:
                                 'callback'], data)
         else:
             try:
-                data = self.json_loads(data)
+                data = self.pubnub.json_loads(data)
             except ValueError:
                 _invoke(self.error, {'error': 'json decoding error'})
                 return
