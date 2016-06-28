@@ -22,7 +22,6 @@ import random
 import sys
 import time
 import uuid as uuid_lib
-from Crypto.Cipher import AES
 from base64 import encodestring, decodestring
 from base64 import urlsafe_b64encode
 
@@ -218,6 +217,7 @@ class PubnubCrypto2():
         return hashlib.sha256(key).hexdigest()
 
     def encrypt(self, key, msg):
+        from Crypto.Cipher import AES
         secret = self.getSecret(key)
         Initial16bytes = '0123456789012345'
         cipher = AES.new(secret[0:32], AES.MODE_CBC, Initial16bytes)
@@ -227,6 +227,7 @@ class PubnubCrypto2():
     def decrypt(self, key, msg):
 
         try:
+            from Crypto.Cipher import AES
             secret = self.getSecret(key)
             Initial16bytes = '0123456789012345'
             cipher = AES.new(secret[0:32], AES.MODE_CBC, Initial16bytes)
@@ -255,7 +256,7 @@ class PubnubCrypto3():
         return hashlib.sha256(key.encode("utf-8")).hexdigest()
 
     def encrypt(self, key, msg):
-
+        from Crypto.Cipher import AES
         secret = self.getSecret(key)
         Initial16bytes = '0123456789012345'
 
@@ -268,7 +269,7 @@ class PubnubCrypto3():
             cipher.encrypt(self.pad(msg.encode('utf-8')))).decode('utf-8')
 
     def decrypt(self, key, msg):
-
+        from Crypto.Cipher import AES
         secret = self.getSecret(key)
         Initial16bytes = '0123456789012345'
 
