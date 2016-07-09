@@ -2632,7 +2632,8 @@ class Pubnub(PubnubCore):
         pooling=True,
         daemon=False,
         pres_uuid=None,
-        azure=False
+        azure=False,
+        connection_pool_maxsize=10,
     ):
         super(Pubnub, self).__init__(
             publish_key=publish_key,
@@ -2662,8 +2663,8 @@ class Pubnub(PubnubCore):
         self.daemon = daemon
 
         if azure is False:
-            s.mount('http://pubsub.pubnub.com', HTTPAdapter(max_retries=1))
-            s.mount('https://pubsub.pubnub.com', HTTPAdapter(max_retries=1))
+            s.mount('http://pubsub.pubnub.com', HTTPAdapter(max_retries=1, pool_maxsize=connection_pool_maxsize))
+            s.mount('https://pubsub.pubnub.com', HTTPAdapter(max_retries=1, pool_maxsize=connection_pool_maxsize))
         else:
             s.mount('http://', PubnubHTTPAdapter(max_retries=1))
             s.mount('https://', PubnubHTTPAdapter(max_retries=1))
